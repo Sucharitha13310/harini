@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>GITAM College Event Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body { background: #f4f6fb; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .hidden { display: none !important; }
+    .card { border-radius: 10px; }
+    .poster-preview { max-width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+    .word-count { font-size: 0.85rem; color: #6c757d; }
+    .small-note { font-size: .85rem; color: #6c757d; }
+    header.site-header { background: #0b5ed7; color: white; padding: 14px 0; margin-bottom: 18px; border-radius: 8px; }
+    header.site-header h1 { font-size: 20px; margin: 0; font-weight: 600; text-align: center; }
+    .role-badge { text-transform: uppercase; font-size: 0.75rem; }
+    .btn-ghost { background: transparent; border: 1px solid #dee2e6; }
+    @media (max-width: 576px) { .poster-preview { max-width: 100px; height: 80px; } }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+
+    <header class="site-header mb-3">
+      <h1 class="text-center">GITAM College Event Management System</h1>
+    </header>
+
+    <!-- Top nav -->
+    <div id="topNav" class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+      <button class="btn btn-outline-primary btn-sm" onclick="showSection('home')">Home</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="showSection('signup')">Sign Up</button>
+      <button class="btn btn-outline-success btn-sm" onclick="showSection('login')">Login</button>
+      <button class="btn btn-outline-danger btn-sm" onclick="resetAll()">Reset Data</button>
+    </div>
+
+    <!-- HOME -->
+    <section id="home" class="card p-4">
+      <h5>Welcome</h5>
+      <p class="mb-1">This portal supports role-based workflows for Students, Club Representatives, and Admins. Create an account and use the appropriate dashboard:</p>
+      <ul>
+        <li><b>Students:</b> Browse approved events, register with detailed participant info, view registrations.</li>
+        <li><b>Clubs:</b> Create event proposals (draft and submit), edit, withdraw or resubmit after rejection.</li>
+        <li><b>Admins:</b> Review pending proposals, approve/reject with comments, view participants, print approval letters.</li>
+      </ul>
+    </section>
+
+    <!-- SIGNUP -->
+    <section id="signup" class="card p-4 hidden">
+      <h5>Create Account</h5>
+      <form id="signupForm" class="row g-2">
+        <div class="col-md-3">
+          <label class="form-label">Role</label>
+          <select id="role" class="form-select" required onchange="onRoleChange()">
+            <option value="student">Student</option>
+            <option value="club">Club Representative</option>
+            <option value="admin">Admin (Faculty)</option>
+          </select>
+        </div>
+
+        <div id="regWrap" class="col-md-3">
+          <label class="form-label">Registration Number</label>
+          <input id="regNo" class="form-control" placeholder="BU21CSE1234"/>
+        </div>
+
+        <div id="empWrap" class="col-md-3 hidden">
+          <label class="form-label">Employee ID</label>
+          <input id="empId" class="form-control" placeholder="EMP1234"/>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Full Name</label>
+          <input id="fullName" class="form-control" required/>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">GITAM Email</label>
+          <input id="email" type="email" class="form-control" placeholder="name@gitam.in" required/>
+          <div class="small-note">Email must end with <code>@gitam.in</code>.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Department</label>
+          <select id="dept" class="form-select">
+            <option>CSE</option><option>ECE</option><option>EEE</option><option>MECH</option><option>CIVIL</option><option>IT</option><option>MBA</option><option>Administration</option><option>Other</option>
+          </select>
+        </div>
+
+        <div id="yearWrap" class="col-md-4">
+          <label class="form-label">Year of Study</label>
+          <select id="year" class="form-select">
+            <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>PG 1st Year</option><option>PG 2nd Year</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Phone (+91)</label>
+          <input id="phone" class="form-control" placeholder="9876543210"/>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <input id="password" type="password" class="form-control" required oninput="passwordStrength()"/>
+          <div id="pwdStrength" class="word-count"></div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Confirm Password</label>
+          <input id="password2" type="password" class="form-control" required/>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Club / Organization (optional)</label>
+          <input id="club" class="form-control" placeholder="Coding Club"/>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Profile Picture (JPG/PNG, &lt;1MB)</label>
+          <input id="profilePic" type="file" accept="image/png,image/jpeg" class="form-control"/>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit">Register</button>
+          <button class="btn btn-link" type="button" onclick="showSection('login')">Already have account? Login</button>
+        </div>
+      </form>
+      <div id="signupMsg" class="mt-2"></div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="login" class="card p-4 hidden">
+      <h5>Login</h5>
+      <form id="loginForm" class="row g-2">
+        <div class="col-md-6">
+          <label class="form-label">GITAM Email</label>
+          <input id="loginEmail" class="form-control" placeholder="name@gitam.in" required/>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Password</label>
+          <input id="loginPassword" type="password" class="form-control" required/>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-success w-100" type="submit">Login</button>
+        </div>
+      </form>
+      <div class="mt-3">
+        <b>Quick Logins (auto-created if missing)</b>
+        <ul>
+          <li>Student: <code>student1@gitam.in / Student@123</code></li>
+          <li>Club: <code>club1@gitam.in / Club@123</code></li>
+          <li>Admin: <code>admin1@gitam.in / Admin@123</code></li>
+        </ul>
+      </div>
+      <div id="loginMsg" class="mt-2"></div>
+    </section>
+
+    <!-- DASHBOARDS AREA -->
+    <section id="dashArea" class="hidden">
+
+      <!-- STUDENT DASHBOARD -->
+      <div id="studentDash" class="card p-4 hidden">
+        <div class="d-flex justify-content-between align-items-center">
+          <div><h5>Student Dashboard</h5><div class="small-note">Browse events and manage your registrations</div></div>
+          <div>
+            <span id="studentDisplayName" class="me-2"></span>
+            <span id="studentRoleBadge" class="badge bg-secondary role-badge">STUDENT</span>
+            <button class="btn btn-outline-danger btn-sm ms-2" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h6>Quick Links</h6>
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-sm" onclick="studentShow('browse')">Browse Events</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="studentShow('myRegs')">My Registrations</button>
+                <button class="btn btn-ghost btn-sm" onclick="studentShow('profile')">My Profile</button>
+              </div>
+            </div>
+            <div class="card p-3 mt-3">
+              <h6>Stats</h6>
+              <p id="studentStats">Loading...</p>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div id="studentContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLUB DASHBOARD -->
+      <div id="clubDash" class="card p-4 hidden">
+        <div class="d-flex justify-content-between align-items-center">
+          <div><h5>Club Dashboard</h5><div class="small-note">Propose events and manage club proposals</div></div>
+          <div>
+            <span id="clubDisplayName"></span>
+            <span id="clubRoleBadge" class="badge bg-secondary role-badge ms-2">CLUB</span>
+            <button class="btn btn-outline-danger btn-sm ms-2" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h6>New Event Proposal</h6>
+              <form id="proposalForm" class="row g-2">
+                <div class="col-12">
+                  <label class="form-label">Event Title</label>
+                  <input id="evtTitle" class="form-control" required/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Category</label>
+                  <select id="evtCategory" class="form-select" required>
+                    <option>Technical</option><option>Cultural</option><option>Sports</option><option>Workshop</option><option>Social</option><option>Other</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Venue</label>
+                  <input id="evtVenue" class="form-control" required/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Event Date</label>
+                  <input id="evtDate" type="date" class="form-control" required/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Duration (hours)</label>
+                  <input id="evtDuration" type="number" min="1" class="form-control" required/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Expected Attendees (10-5000)</label>
+                  <input id="evtCapacity" type="number" min="10" max="5000" class="form-control" value="100" required/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Description (50-500 words)</label>
+                  <textarea id="evtDesc" rows="4" class="form-control" required></textarea>
+                  <div class="d-flex justify-content-between"><div id="descCount" class="word-count"></div><div class="small-note">Poster: JPG/PNG, max 2MB</div></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Event Poster (optional)</label>
+                  <input id="evtPoster" type="file" accept="image/png,image/jpeg" class="form-control"/>
+                </div>
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                  <button type="button" class="btn btn-success" onclick="submitProposal(false)">Submit Proposal</button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="submitProposal(true)">Save Draft</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h6>Your Proposals</h6>
+              <div id="clubProposals"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN DASHBOARD -->
+      <div id="adminDash" class="card p-4 hidden">
+        <div class="d-flex justify-content-between align-items-center">
+          <div><h5>Admin Dashboard</h5><div class="small-note">Review proposals and manage events</div></div>
+          <div>
+            <span id="adminDisplayName"></span>
+            <span id="adminRoleBadge" class="badge bg-secondary role-badge ms-2">ADMIN</span>
+            <button class="btn btn-outline-danger btn-sm ms-2" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h6>Pending Proposals</h6>
+              <div id="adminPending"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h6>Approved Events</h6>
+              <div id="adminApproved"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer class="text-center small-note mt-3">Data stored in browser for demo purposes only. For a production system, use a secure backend and hashed passwords.</footer>
+  </div>
+
+<script>
+/* -------------------------
+   GITAM College Event Management System
+   Single-file frontend with localStorage persistence
+   Roles: student, club, admin
+   -------------------------*/
+
+/* LocalStorage keys */
+const LS_USERS = 'uems_users_v2';
+const LS_EVENTS = 'uems_events_v2';
+const LS_CURRENT = 'uems_current_v2';
+
+/* Helpers */
+function uid(){ return Date.now().toString(36) + Math.floor(Math.random()*10000).toString(36); }
+function showSection(id){
+  ['home','signup','login'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  if(id==='dash') document.getElementById('dashArea').classList.remove('hidden');
+  else document.getElementById('dashArea').classList.add('hidden');
+  if(document.getElementById(id)) document.getElementById(id).classList.remove('hidden');
+}
+function getUsers(){ return JSON.parse(localStorage.getItem(LS_USERS) || '[]'); }
+function setUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+function getEvents(){ return JSON.parse(localStorage.getItem(LS_EVENTS) || '[]'); }
+function setEvents(e){ localStorage.setItem(LS_EVENTS, JSON.stringify(e)); }
+function getCurrent(){ return JSON.parse(localStorage.getItem(LS_CURRENT) || 'null'); }
+function setCurrent(u){ localStorage.setItem(LS_CURRENT, JSON.stringify(u)); }
+
+/* Seed quick demo users */
+(function seed(){
+  if(!localStorage.getItem(LS_USERS)){
+    const base = [
+      { id: uid(), role:'student', name:'Student One', email:'student1@gitam.in', reg:'BU21CSE0001', dept:'CSE', year:'3rd Year', phone:'9876500000', club:'Coding Club', pass:'Student@123', verified:true },
+      { id: uid(), role:'club', name:'Club Representative', email:'club1@gitam.in', dept:'CSE', phone:'9811100000', club:'Coding Club', pass:'Club@123', verified:true },
+      { id: uid(), role:'admin', name:'Admin One', email:'admin1@gitam.in', dept:'Administration', phone:'9000000000', pass:'Admin@123', verified:true }
+    ];
+    setUsers(base);
+  }
+  if(!localStorage.getItem(LS_EVENTS)) setEvents([]);
+})();
+
+/* UI helpers for role-specific signup fields */
+function onRoleChange(){
+  const role = document.getElementById('role').value;
+  document.getElementById('regWrap').style.display = role==='student' ? 'block' : 'none';
+  document.getElementById('empWrap').style.display = role==='admin' ? 'block' : 'none';
+  document.getElementById('yearWrap').style.display = role==='student' ? 'block' : 'none';
+}
+
+/* Password strength */
+function passwordStrength(){
+  const p = document.getElementById('password').value || '';
+  let score = 0;
+  if(p.length >= 8) score++;
+  if(/[A-Z]/.test(p)) score++;
+  if(/[a-z]/.test(p)) score++;
+  if(/[0-9]/.test(p)) score++;
+  if(/[^A-Za-z0-9]/.test(p)) score++;
+  const el = document.getElementById('pwdStrength');
+  if(score <= 2) el.innerHTML = '<span style="color:#d9534f">Weak</span>';
+  else if(score <= 4) el.innerHTML = '<span style="color:#f0ad4e">Medium</span>';
+  else el.innerHTML = '<span style="color:#5cb85c">Strong</span>';
+}
+
+/* Signup submit */
+document.getElementById('signupForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const role = document.getElementById('role').value;
+  const name = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const dept = document.getElementById('dept').value;
+  const year = document.getElementById('year').value;
+  const phone = document.getElementById('phone').value.trim();
+  const pass = document.getElementById('password').value;
+  const pass2 = document.getElementById('password2').value;
+  const club = document.getElementById('club').value.trim();
+  const reg = document.getElementById('regNo').value.trim();
+  const emp = document.getElementById('empId').value.trim();
+  const pic = document.getElementById('profilePic').files[0];
+
+  // validations
+  if(!name || !email || !pass || !pass2) return showMessage('signupMsg','Please fill required fields','danger');
+  if(!email.endsWith('@gitam.in')) return showMessage('signupMsg','Email must be @gitam.in','danger');
+  if(pass !== pass2) return showMessage('signupMsg','Passwords do not match','danger');
+  if(pass.length < 8) return showMessage('signupMsg','Password must be at least 8 characters','danger');
+  if(phone && !/^\d{10}$/.test(phone)) return showMessage('signupMsg','Phone must be 10 digits','danger');
+  const users = getUsers();
+  if(users.find(u=>u.email === email)) return showMessage('signupMsg','Email already registered','danger');
+  if(role === 'student'){
+    if(!reg) return showMessage('signupMsg','Registration number required for students','danger');
+    if(users.find(u=>u.reg === reg)) return showMessage('signupMsg','Registration number already used','danger');
+  }
+  if(pic && pic.size > 1024*1024) return showMessage('signupMsg','Profile picture must be <1MB','danger');
+
+  let picData = '';
+  if(pic) picData = await readFileAsBase64(pic);
+
+  const user = { id: uid(), role, name, email, dept, year: role==='student'?year:undefined, phone, pass, club: role!=='student'?undefined:club || undefined, reg: role==='student'?reg:undefined, emp: role==='admin'?emp:undefined, pic: picData, verified: true };
+  users.push(user);
+  setUsers(users);
+  document.getElementById('signupForm').reset();
+  showMessage('signupMsg','Registration successful. You can now login.','success');
+});
+
+/* Login */
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  if(!email || !pass) return showMessage('loginMsg','Enter login credentials','danger');
+
+  // ensure demo accounts exist
+  ensureDemoUsers();
+
+  const users = getUsers();
+  const user = users.find(u=>u.email===email && u.pass === pass);
+  if(!user) return showMessage('loginMsg','Invalid credentials','danger');
+
+  setCurrent({ id: user.id, role: user.role, name: user.name, email: user.email });
+  // hide top nav and auth screens, show dashboards
+  document.getElementById('topNav').style.display = 'none';
+  showSection('dash');
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('signup').classList.add('hidden');
+  document.getElementById('login').classList.add('hidden');
+  if(user.role === 'student') initStudent();
+  else if(user.role === 'club') initClub();
+  else if(user.role === 'admin') initAdmin();
+});
+
+/* Ensure demo users present */
+function ensureDemoUsers(){
+  const users = getUsers();
+  let changed = false;
+  if(!users.find(u=>u.email === 'student1@gitam.in')){ users.push({ id: uid(), role:'student', name:'Student One', email:'student1@gitam.in', reg:'BU21CSE0001', dept:'CSE', year:'3rd Year', phone:'9876500000', pass:'Student@123', verified:true }); changed = true; }
+  if(!users.find(u=>u.email === 'club1@gitam.in')){ users.push({ id: uid(), role:'club', name:'Club Rep', email:'club1@gitam.in', dept:'CSE', phone:'9811100000', club:'Coding Club', pass:'Club@123', verified:true }); changed = true; }
+  if(!users.find(u=>u.email === 'admin1@gitam.in')){ users.push({ id: uid(), role:'admin', name:'Admin One', email:'admin1@gitam.in', dept:'Administration', phone:'9000000000', pass:'Admin@123', verified:true }); changed = true; }
+  if(changed) setUsers(users);
+}
+
+/* Show messages */
+function showMessage(id, msg, type='info'){ document.getElementById(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`; setTimeout(()=>{ if(document.getElementById(id)) document.getElementById(id).innerHTML = ''; }, 6000); }
+
+/* Logout */
+function logout(){ localStorage.removeItem(LS_CURRENT); location.reload(); }
+
+/* Read file to base64 helper */
+function readFileAsBase64(file){ return new Promise((res, rej)=>{ const r = new FileReader(); r.onload = ()=>res(r.result); r.onerror = ()=>rej(); r.readAsDataURL(file); }); }
+
+/* Reset data */
+function resetAll(){ if(!confirm('Clear all stored data?')) return; localStorage.removeItem(LS_USERS); localStorage.removeItem(LS_EVENTS); localStorage.removeItem(LS_CURRENT); location.reload(); }
+
+/* ---------- STUDENT ---------- */
+function initStudent(){
+  document.getElementById('studentDash').classList.remove('hidden');
+  document.getElementById('clubDash').classList.add('hidden');
+  document.getElementById('adminDash').classList.add('hidden');
+  const cur = getCurrent();
+  document.getElementById('studentDisplayName').textContent = cur.name;
+  studentShow('browse');
+  updateStudentStats();
+}
+
+function studentShow(view){
+  const content = document.getElementById('studentContent');
+  const cur = getCurrent();
+  if(view === 'browse'){
+    const events = getEvents().filter(e=>e.status === 'Approved');
+    if(events.length === 0){ content.innerHTML = '<p>No approved events currently.</p>'; return; }
+    let html = '<div class="row g-3">';
+    events.forEach(ev=>{
+      const registered = ev.participants && ev.participants.includes(cur.email);
+      const left = ev.capacity - (ev.participants?ev.participants.length:0);
+      html += `<div class="col-md-6"><div class="card p-3">
+        <div class="d-flex justify-content-between"><h6>${ev.title}</h6><small class="small-note">${ev.category}</small></div>
+        <p><b>Club:</b> ${ev.club} | <b>Date:</b> ${ev.date} | <b>Venue:</b> ${ev.venue}</p>
+        <p class="small-note">${ev.desc ? ev.desc.substring(0,120) + (ev.desc.length>120?'...':'') : ''}</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary" onclick="viewEvent('${ev.id}')">View</button>
+          <button class="btn btn-sm btn-success" onclick="openRegister('${ev.id}')" ${left<=0 || registered ? 'disabled' : ''}>Register (${left} left)</button>
+        </div>
+      </div></div>`;
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  } else if(view === 'myRegs'){
+    const regs = getEvents().filter(e=>e.participants && e.participants.includes(cur.email));
+    if(regs.length === 0) { content.innerHTML = '<p>You have not registered for any events.</p>'; return; }
+    let html = '<div class="list-group">';
+    regs.forEach(ev=> html += `<div class="list-group-item d-flex justify-content-between"><div><b>${ev.title}</b><div class="small-note">${ev.date} | ${ev.venue}</div></div><div><button class="btn btn-sm btn-outline-secondary" onclick="viewEvent('${ev.id}')">View</button></div></div>`);
+    html += '</div>';
+    content.innerHTML = html;
+  } else if(view === 'profile'){
+    const users = getUsers(); const user = users.find(u=>u.email===cur.email);
+    content.innerHTML = `<div class="card p-3"><h6>Profile</h6>
+      <p><b>Name:</b> ${user.name}</p>
+      <p><b>Email:</b> ${user.email}</p>
+      <p><b>Department:</b> ${user.dept}</p>
+      ${user.reg?`<p><b>Reg No:</b> ${user.reg}</p>`:''}
+      ${user.phone?`<p><b>Phone:</b> ${user.phone}</p>`:''}
+    </div>`;
+  }
+}
+
+/* student stats */
+function updateStudentStats(){
+  const cur = getCurrent();
+  const events = getEvents();
+  const submitted = events.filter(e=>e.submittedBy === cur.email).length;
+  const registered = events.filter(e=>e.participants && e.participants.includes(cur.email)).length;
+  document.getElementById('studentStats').innerHTML = `Proposals submitted: <b>${submitted}</b><br>Registered events: <b>${registered}</b>`;
+}
+
+/* view event (popup) */
+function viewEvent(id){
+  const ev = getEvents().find(e=>e.id===id);
+  if(!ev) return alert('Event not found');
+  const w = window.open('', '_blank', 'width=700,height=700');
+  const participants = ev.participants?ev.participants.length:0;
+  const posterHtml = ev.poster ? `<img src="${ev.poster}" class="poster-preview mb-2"/>` : '';
+  w.document.write(`<div style="font-family:Arial;padding:18px;"><h3>${ev.title}</h3>${posterHtml}<p><b>Club:</b> ${ev.club}</p><p><b>Date:</b> ${ev.date} | <b>Venue:</b> ${ev.venue}</p><p><b>Capacity:</b> ${ev.capacity} | <b>Registered:</b> ${participants}</p><hr><p>${ev.desc}</p></div>`);
+}
+
+/* register for event (detailed participant info) */
+function openRegister(id){
+  const evs = getEvents(); const ev = evs.find(x=>x.id===id);
+  if(!ev || ev.status !== 'Approved') return alert('Event not available');
+  const cur = getCurrent();
+  // Simple form via series of prompts (keeps UI simple)
+  const name = prompt('Full name:', cur.name || '');
+  if(!name) return;
+  const roll = prompt('Registration number (e.g. BU21CSE1234):', cur.reg || '');
+  if(!roll) return;
+  const email = prompt('Email (must be @gitam.in):', cur.email || '');
+  if(!email || !email.endsWith('@gitam.in')) return alert('Provide a valid @gitam.in email');
+  const phone = prompt('Contact phone (10 digits):', cur.phone || '');
+  if(!phone || !/^\d{10}$/.test(phone)) return alert('Invalid phone number');
+  ev.participants = ev.participants || [];
+  if(ev.participants.includes(email)) return alert('Already registered');
+  if(ev.participants.length >= ev.capacity) return alert('Event is full');
+  ev.participants.push(email);
+  setEvents(evs);
+  alert('Registration successful');
+  studentShow('browse'); updateStudentStats();
+}
+
+/* ---------- CLUB ---------- */
+function initClub(){
+  document.getElementById('clubDash').classList.remove('hidden');
+  document.getElementById('studentDash').classList.add('hidden');
+  document.getElementById('adminDash').classList.add('hidden');
+  const cur = getCurrent();
+  document.getElementById('clubDisplayName').textContent = cur.name;
+  renderClubProposals();
+}
+
+/* count description words */
+document.getElementById('evtDesc').addEventListener('input', function(){ const words = this.value.trim().split(/\s+/).filter(Boolean).length; document.getElementById('descCount').textContent = words + ' words'; });
+
+/* submit proposal */
+async function submitProposal(saveDraft=false){
+  const title = document.getElementById('evtTitle').value.trim();
+  const category = document.getElementById('evtCategory').value;
+  const venue = document.getElementById('evtVenue').value.trim();
+  const date = document.getElementById('evtDate').value;
+  const duration = Number(document.getElementById('evtDuration').value || 0);
+  const capacity = Number(document.getElementById('evtCapacity').value || 0);
+  const desc = document.getElementById('evtDesc').value.trim();
+  const posterFile = document.getElementById('evtPoster').files[0];
+  const cur = getCurrent();
+  if(!title || !category || !venue) return alert('Fill required fields');
+  if(!saveDraft){
+    if(!date) return alert('Select an event date');
+    // date must be at least 7 days from today
+    const today = new Date(); today.setHours(0,0,0,0);
+    const minDate = new Date(today.getTime() + 7*24*60*60*1000);
+    const dsel = new Date(date);
+    if(dsel < minDate) return alert('Event date must be at least 7 days from today');
+    if(desc.split(/\s+/).filter(Boolean).length < 50) return alert('Description should be at least 50 words');
+    if(capacity < 10 || capacity > 5000) return alert('Capacity must be between 10 and 5000');
+  }
+  if(posterFile && posterFile.size > 2*1024*1024) return alert('Poster must be <2MB');
+  let posterData = '';
+  if(posterFile) posterData = await readFileAsBase64(posterFile);
+
+  const ev = {
+    id: uid(),
+    title,
+    category,
+    venue,
+    date: date || null,
+    duration,
+    capacity,
+    desc,
+    poster: posterData,
+    status: saveDraft ? 'Draft' : 'Pending',
+    submittedBy: cur.email,
+    club: cur.club || cur.name,
+    participants: [],
+    adminComment: '',
+    createdAt: new Date().toISOString()
+  };
+
+  const events = getEvents(); events.push(ev); setEvents(events);
+  document.getElementById('proposalForm').reset();
+  document.getElementById('descCount').textContent = '';
+  renderClubProposals();
+  alert(saveDraft ? 'Draft saved' : 'Proposal submitted for approval');
+}
+
+/* render club proposals */
+function renderClubProposals(){
+  const cur = getCurrent();
+  const container = document.getElementById('clubProposals');
+  const events = getEvents().filter(e=>e.submittedBy === cur.email).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(events.length === 0){ container.innerHTML = '<p>No proposals yet.</p>'; return; }
+  let html = '';
+  events.forEach(ev=>{
+    html += `<div class="card p-2 mb-2">
+      <div class="d-flex justify-content-between"><div><b>${ev.title}</b><div class="small-note">${ev.date ? ev.date + ' | ' + ev.venue : 'No date set'}</div></div><div><span class="badge ${ev.status==='Approved'?'bg-success':ev.status==='Rejected'?'bg-danger':ev.status==='Pending'?'bg-warning text-dark':'bg-secondary'}">${ev.status}</span></div></div>
+      <div class="mt-2">${ev.desc ? ev.desc.substring(0,140) + (ev.desc.length>140?'...':'') : ''}</div>
+      <div class="mt-2 d-flex gap-2">`;
+    if(ev.status === 'Draft') html += `<button class="btn btn-sm btn-outline-primary" onclick="editDraft('${ev.id}')">Edit</button><button class="btn btn-sm btn-outline-danger" onclick="deleteEvent('${ev.id}')">Delete</button>`;
+    if(ev.status === 'Pending') html += `<button class="btn btn-sm btn-outline-secondary" onclick="withdraw('${ev.id}')">Withdraw</button>`;
+    if(ev.status === 'Rejected') html += `<button class="btn btn-sm btn-outline-success" onclick="resubmit('${ev.id}')">Resubmit</button>`;
+    if(ev.status === 'Approved') html += `<button class="btn btn-sm btn-outline-primary" onclick="viewEvent('${ev.id}')">View</button>`;
+    html += `</div>${ev.adminComment?`<div class="small-note mt-2"><b>Admin comment:</b> ${ev.adminComment}</div>`:''}</div>`;
+  });
+  container.innerHTML = html;
+}
+
+/* edit draft */
+function editDraft(id){
+  const ev = getEvents().find(x=>x.id===id);
+  if(!ev || ev.status !== 'Draft') return alert('Cannot edit');
+  document.getElementById('evtTitle').value = ev.title;
+  document.getElementById('evtCategory').value = ev.category;
+  document.getElementById('evtVenue').value = ev.venue;
+  document.getElementById('evtDate').value = ev.date || '';
+  document.getElementById('evtDuration').value = ev.duration || '';
+  document.getElementById('evtCapacity').value = ev.capacity || '';
+  document.getElementById('evtDesc').value = ev.desc || '';
+  // remove old and allow resave
+  deleteEvent(id);
+}
+
+/* withdraw pending */
+function withdraw(id){ if(!confirm('Withdraw this proposal?')) return; const events = getEvents(); const idx = events.findIndex(x=>x.id===id); if(idx>-1){ events.splice(idx,1); setEvents(events); renderClubProposals(); alert('Proposal withdrawn'); } }
+
+/* delete event */
+function deleteEvent(id){ if(!confirm('Delete this event?')) return; const evs = getEvents(); const idx = evs.findIndex(x=>x.id===id); if(idx>-1){ evs.splice(idx,1); setEvents(evs); renderClubProposals(); } }
+
+/* resubmit rejected */
+function resubmit(id){ const ev = getEvents().find(x=>x.id===id); if(!ev || ev.status !== 'Rejected') return; ev.status = 'Pending'; ev.adminComment = ''; setEvents(getEvents()); renderClubProposals(); alert('Resubmitted for approval'); }
+
+/* ---------- ADMIN ---------- */
+function initAdmin(){
+  document.getElementById('adminDash').classList.remove('hidden');
+  document.getElementById('studentDash').classList.add('hidden');
+  document.getElementById('clubDash').classList.add('hidden');
+  const cur = getCurrent(); document.getElementById('adminDisplayName').textContent = cur.name;
+  renderAdminPending(); renderAdminApproved();
+}
+
+/* render pending proposals */
+function renderAdminPending(){
+  const container = document.getElementById('adminPending'); container.innerHTML = '';
+  const pending = getEvents().filter(e=>e.status === 'Pending').sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  if(pending.length === 0){ container.innerHTML = '<p>No pending proposals.</p>'; return; }
+  pending.forEach(ev=>{
+    const div = document.createElement('div'); div.className = 'card p-2 mb-2';
+    div.innerHTML = `<div class="d-flex justify-content-between"><b>${ev.title}</b><small class="small-note">${ev.club}</small></div>
+      <div class="small-note">${ev.date ? ev.date + ' | ' + ev.venue : 'No date set'}</div>
+      <p class="small-note mt-2">${ev.desc ? ev.desc.substring(0,220)+'...' : ''}</p>
+      <div class="mt-2 d-flex gap-2">
+        <button class="btn btn-sm btn-success" onclick="approvePrompt('${ev.id}')">Approve</button>
+        <button class="btn btn-sm btn-danger" onclick="rejectPrompt('${ev.id}')">Reject</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="viewEvent('${ev.id}')">View</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+/* approve prompt */
+function approvePrompt(id){
+  const comment = prompt('Optional approval comment (visible to club):', 'Approved');
+  if(comment === null) return;
+  const events = getEvents(); const ev = events.find(x=>x.id===id);
+  ev.status = 'Approved'; ev.adminComment = comment || ''; ev.approvedBy = getCurrent().email; ev.approvedOn = new Date().toISOString();
+  setEvents(events); renderAdminPending(); renderAdminApproved(); alert('Proposal approved');
+}
+
+/* reject prompt */
+function rejectPrompt(id){
+  const reason = prompt('Enter rejection reason (required):', '');
+  if(!reason) return alert('Rejection reason required');
+  const events = getEvents(); const ev = events.find(x=>x.id===id);
+  ev.status = 'Rejected'; ev.adminComment = reason; setEvents(events);
+  renderAdminPending(); renderAdminApproved(); alert('Proposal rejected');
+}
+
+/* render approved events */
+function renderAdminApproved(){
+  const container = document.getElementById('adminApproved'); container.innerHTML = '';
+  const approved = getEvents().filter(e=>e.status === 'Approved').sort((a,b)=>new Date(b.approvedOn || 0)-new Date(a.approvedOn || 0));
+  if(approved.length === 0){ container.innerHTML = '<p>No approved events.</p>'; return; }
+  approved.forEach(ev=>{
+    const div = document.createElement('div'); div.className = 'card p-2 mb-2';
+    const count = ev.participants ? ev.participants.length : 0;
+    div.innerHTML = `<div class="d-flex justify-content-between"><b>${ev.title}</b><small class="small-note">Registered: ${count}/${ev.capacity}</small></div>
+      <div class="small-note">${ev.date} | ${ev.venue}</div>
+      <div class="mt-2 d-flex gap-2">
+        <button class="btn btn-sm btn-outline-primary" onclick="viewParticipants('${ev.id}')">Participants</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="printApproval('${ev.id}')">Print Approval</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="closeEvent('${ev.id}')">Close Event</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+/* view participants */
+function viewParticipants(id){
+  const ev = getEvents().find(x=>x.id===id);
+  if(!ev) return alert('Event not found');
+  const w = window.open('', '_blank', 'width=600,height=600');
+  w.document.write(`<h3>Participants — ${ev.title}</h3>`);
+  if(!ev.participants || ev.participants.length === 0) w.document.write('<p>No participants yet.</p>');
+  else w.document.write('<ul>' + ev.participants.map(p=>`<li>${p}</li>`).join('') + '</ul>');
+}
+
+/* print approval letter */
+function printApproval(id){
+  const ev = getEvents().find(x=>x.id===id);
+  if(!ev) return alert('Not found');
+  const w = window.open('', '_blank', 'width=800,height=700');
+  const approvedOn = ev.approvedOn ? new Date(ev.approvedOn).toLocaleDateString() : new Date().toLocaleDateString();
+  const html = `<div style="font-family:Arial;padding:20px;">
+    <h2>GITAM College Event Management System</h2>
+    <h4>Event Approval Letter</h4>
+    <p><b>Event:</b> ${ev.title}</p>
+    <p><b>Organized by:</b> ${ev.club}</p>
+    <p><b>Date:</b> ${ev.date || 'TBD'} | <b>Venue:</b> ${ev.venue}</p>
+    <p><b>Capacity:</b> ${ev.capacity}</p>
+    <p>This is to certify that the above event has been <b>approved</b>.</p>
+    <p><b>Approved by:</b> ${ev.approvedBy || 'Admin'}</p>
+    <p><b>Approved on:</b> ${approvedOn}</p>
+    <p><b>Comments:</b> ${ev.adminComment || ''}</p>
+    <div style="margin-top:50px;"><p>__________________</p><p>Authorized Signatory</p></div>
+  </div>`;
+  w.document.write(html); w.print();
+}
+
+/* close event (admin optionally remove or mark completed) */
+function closeEvent(id){
+  if(!confirm('Close this event? (it will remain as record but not listed for registration)')) return;
+  const ev = getEvents().find(x=>x.id===id);
+  if(!ev) return;
+  ev.status = 'Closed';
+  setEvents(getEvents());
+  renderAdminApproved();
+}
+
+/* ---------- Misc helpers ---------- */
+function showSectionTop(id){ document.getElementById('topNav').style.display = 'flex'; showSection(id); }
+function editDraft(id){ editDraft(id); } // alias for inline handlers
+function deleteEvent(id){ deleteEvent(id); } // alias
+function withdraw(id){ withdraw(id); } // alias
+function resubmit(id){ resubmit(id); } // alias
+
+/* On page load — restore session if logged in */
+window.onload = function(){
+  onRoleChange();
+  const cur = getCurrent();
+  if(cur){
+    document.getElementById('topNav').style.display = 'none';
+    showSection('dash');
+    if(cur.role === 'student') initStudent();
+    else if(cur.role === 'club') initClub();
+    else if(cur.role === 'admin') initAdmin();
+  } else {
+    showSection('home');
+  }
+};
+</script>
+</body>
+</html>
